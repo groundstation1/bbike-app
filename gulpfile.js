@@ -50,7 +50,7 @@ var paths = {
         ]),
     scripts: [
         'node_modules/jquery/dist/jquery.js',
-        'node_modules/async/lib/async.js',
+        'node_modules/async/dist/async.js',
         'node_modules/leaflet/dist/leaflet-src.js',
     ]
         .concat(
@@ -98,8 +98,8 @@ var paths = {
     destName: 'brouter-web',
 };
 
-gulp.task('clean', function (cb) {
-    del(paths.dest + '/**/*', cb);
+gulp.task('clean', function () {
+    return del(paths.dest + '/**/*');
 });
 
 // libs that require loading before config.js
@@ -421,18 +421,12 @@ gulp.task('release:zip_standalone', function () {
     var root = gulp.src(['resources/standalone/run.sh', 'resources/standalone/segments4']);
 
     var serverRoot = gulp
-        .src(
-            [
-                'misc/readmes/profile_developers_guide.txt',
-                'brouter-server/target/brouter-server-*-jar-with-dependencies.jar',
-            ],
-            {
-                cwd: path.join(process.cwd(), '../brouter'),
-            }
-        )
+        .src(['docs/developers/profile_developers_guide.md', 'brouter-server/build/libs/brouter-*-all.jar'], {
+            cwd: path.join(process.cwd(), '../brouter'),
+        })
         .pipe(
             rename(function (path) {
-                if (path.basename.startsWith('brouter-server-')) {
+                if (path.basename.startsWith('brouter-') && path.basename.endsWith('-all')) {
                     path.basename = 'brouter';
                 }
             })

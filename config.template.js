@@ -54,8 +54,13 @@
         'vm-forum-velomobil-schnell',
         'fastbike-lowtraffic',
         'fastbike-asia-pacific',
-        'hiking-beta',
+        'hiking-mountain',
     ];
+
+    // Map old, renamed legacy profile to new name (from hash of shared or bookmarked URLs)
+    BR.conf.profilesRename = {
+        'hiking-beta': 'hiking-mountain',
+    };
 
     // Removes default base layers when 'true'. Useful for only having custom layers (see below).
     BR.conf.clearBaseLayers = false;
@@ -99,6 +104,18 @@
         },
         nodata: {
             color: 'darkred',
+        },
+        beeline: {
+            weight: 5,
+            dashArray: [1, 10],
+            color: 'magenta',
+            opacity: BR.conf.defaultOpacity,
+        },
+        beelineTrailer: {
+            weight: 5,
+            dashArray: [1, 10],
+            opacity: 0.6,
+            color: 'magenta',
         },
     };
 
