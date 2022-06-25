@@ -22,8 +22,8 @@ BR.LayersConfig = L.Class.extend({
             var item = localStorage.getItem('map/defaultLayers');
             if (item) {
                 var defaultLayers = JSON.parse(item);
-                this.defaultBaseLayers = defaultLayers.baseLayers;
-                this.defaultOverlays = defaultLayers.overlays;
+                this.defaultBaseLayers = this._replaceLegacyIds(defaultLayers.baseLayers);
+                this.defaultOverlays = this._replaceLegacyIds(defaultLayers.overlays);
             }
         }
     },
@@ -36,6 +36,10 @@ BR.LayersConfig = L.Class.extend({
             };
             localStorage.setItem('map/defaultLayers', JSON.stringify(defaultLayers));
         }
+    },
+
+    _replaceLegacyIds: function (idList) {
+        return idList.map((id) => (id in this.legacyNameToIdMap ? this.legacyNameToIdMap[id] : id));
     },
 
     _addLeafletProvidersLayers: function () {
@@ -65,7 +69,7 @@ BR.LayersConfig = L.Class.extend({
             if (layer) {
                 var properties = propertyOverrides[id];
 
-                for (key in properties) {
+                for (const key in properties) {
                     var value = properties[key];
                     layer.properties[key] = value;
                 }
@@ -240,6 +244,37 @@ BR.LayersConfig = L.Class.extend({
         return new leafletOsmNotes();
     },
 
+    createMvtLayer: function (props, options) {
+        // remove key, only provided with local style to not add layer when not configured, see _getLayers
+        const styleId = props.url?.split('?')[0];
+        if (styleId in BR.layerIndex) {
+            // url is key to style in local layers bundle (file name without '.json'),
+            // suggested file naming convention: `<layer id>-style.json`
+            options.style = BR.layerIndex[styleId];
+
+            this._replaceMvtTileKey(options.style);
+        } else {
+            // external URL to style.json
+            options.style = props.url;
+        }
+
+        return BR.maplibreGlLazyLoader(options);
+    },
+
+    _replaceMvtTileKey: function (style) {
+        if (!style) return;
+
+        for (const source of Object.values(style.sources)) {
+            const tiles = source.tiles;
+            for (const [i, url] of tiles?.entries()) {
+                var keyObj = this.getKeyName(url);
+                if (keyObj && BR.keys[keyObj.name]) {
+                    tiles[i] = url.replace(`{${keyObj.urlVar}}`, BR.keys[keyObj.name]);
+                }
+            }
+        }
+    },
+
     createLayer: function (layerData) {
         var props = layerData.properties;
         var url = props.url;
@@ -326,6 +361,8 @@ BR.LayersConfig = L.Class.extend({
             layer = this.createOverpassLayer(props.query, props.icon);
         } else if (props.dataSource === 'OpenStreetMapNotesAPI') {
             layer = this.createOpenStreetMapNotesLayer();
+        } else if (props.type === 'mvt') {
+            layer = this.createMvtLayer(props, options);
         } else {
             // JOSM
             var josmUrl = url;

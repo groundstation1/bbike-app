@@ -216,7 +216,7 @@ BR.confLayers.getPropertyOverrides = function() {
             'nameShort': 'MTB',
             'mapUrl': 'http://mtb.waymarkedtrails.org/#?map={zoom}!{lat}!{lon}'
         },
-        'mapillary-coverage-raster': {
+        'mapillary-coverage': {
             'nameShort': 'Mapillary',
             'mapUrl': 'https://www.mapillary.com/app/?lat={lat}&lng={lon}&z={zoom}&menu=false'
         },
@@ -248,5 +248,8 @@ BR.confLayers.getPropertyOverrides = function() {
             'nameShort': 'CyclOSM',
             'mapUrl': 'https://www.cyclosm.org/#map={zoom}/{lat}/{lon}/cyclosm'
         },
+        'terrarium-hillshading': {
+            'name': i18next.t('map.layer.hillshading')
+        }
     };
 };

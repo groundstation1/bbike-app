@@ -40,9 +40,13 @@ var paths = {
     scriptsConfig: mainNpmFiles()
         .filter(
             (f) =>
+                // index.html
                 RegExp('url-search-params/.*\\.js', 'i').test(f) ||
                 RegExp('core-js-bundle/.*\\.js', 'i').test(f) ||
-                RegExp('regenerator-runtime/.*\\.js', 'i').test(f)
+                RegExp('regenerator-runtime/.*\\.js', 'i').test(f) ||
+                // dynamic import in MaplibreGlLazyLoader
+                RegExp('maplibre-gl/.*\\.js', 'i').test(f) ||
+                RegExp('@maplibre/maplibre-gl-leaflet/.*\\.js', 'i').test(f)
         )
         .concat([
             // large lib as extra file for faster parallel loading (*.min.js already excluded from bundle)
@@ -60,7 +64,9 @@ var paths = {
                     !RegExp('.*\\.min\\.js', 'i').test(f) &&
                     !RegExp('url-search-params/.*\\.js', 'i').test(f) &&
                     !RegExp('core-js-bundle/.*\\.js', 'i').test(f) &&
-                    !RegExp('regenerator-runtime/.*\\.js', 'i').test(f)
+                    !RegExp('regenerator-runtime/.*\\.js', 'i').test(f) &&
+                    !RegExp('maplibre-gl/.*\\.js', 'i').test(f) &&
+                    !RegExp('@maplibre/maplibre-gl-leaflet/.*\\.js', 'i').test(f)
             )
         )
         .concat([
@@ -83,7 +89,7 @@ var paths = {
     fonts: mainNpmFiles().filter((f) => RegExp('font-awesome/fonts/.*', 'i').test(f)),
     changelog: 'CHANGELOG.md',
     locales: 'locales/*.json',
-    layers: 'layers/**/*.geojson',
+    layers: ['layers/**/*.geojson', 'layers/**/*.json'],
     layersDestName: 'layers.js',
     layersConfig: [
         'layers/config/config.js',
@@ -128,7 +134,7 @@ gulp.task('scripts', function () {
         .src(paths.scripts, { base: '.' })
         .pipe(sourcemaps.init())
         .pipe(cached('scripts'))
-        .pipe(gulpif(!debug, babel()))
+        .pipe(gulpif(!debug, babel({ caller: { supportsDynamicImport: true } })))
         .pipe(gulpif(!debug, uglify()))
         .pipe(remember('scripts'))
         .pipe(concat(paths.destName + '.js'))
@@ -219,10 +225,7 @@ gulp.task('watch', function () {
 // Print paths to console, for manually debugging the gulp build
 // (comment out corresponding line of paths to print)
 gulp.task('log', function () {
-    // var src = paths.scripts
-    // var src = paths.styles
-    // var src = paths.images
-    // var src = paths.locales
+    // var src = paths.scriptsConfig;
     var src = paths.scripts.concat(paths.styles).concat(paths.images).concat(paths.locales);
 
     return gulp.src(src).pipe(gulpDebug());
@@ -239,19 +242,16 @@ gulp.task('inject', function () {
 });
 
 var pkg = require('./package.json');
-var nextVersion;
-var ghToken;
+var nextVersion = pkg.version;
+var ghToken = gutil.env.token;
 
 gulp.task('release:init', function (cb) {
-    ghToken = gutil.env.token;
     if (!ghToken) {
         return cb(new Error('--token is required (github personal access token'));
     }
     if (ghToken.length != 40) {
         return cb(new Error('--token length must be 40, not ' + ghToken.length));
     }
-
-    nextVersion = pkg.version;
 
     if (gutil.env.skipnewtag) {
         return cb();
