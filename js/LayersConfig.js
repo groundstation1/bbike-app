@@ -86,6 +86,10 @@ BR.LayersConfig = L.Class.extend({
         BR.layerIndex['swisstopo-aerial'].geometry = BR.confLayers.switzerlandPadded;
 
         BR.layerIndex['1017'].geometry = BR.confLayers.osmapaPl;
+
+        BR.layerIndex['ignf-aerial'].geometry = BR.confLayers.franceBbox;
+        BR.layerIndex['ignf-map'].geometry = BR.confLayers.franceBbox;
+        BR.layerIndex['ignf-scan25'].geometry = BR.confLayers.franceBbox;
     },
 
     _addLanguageDefaultLayer: function () {
@@ -216,7 +220,7 @@ BR.LayersConfig = L.Class.extend({
                 minZoom: 12,
                 feature: {
                     title: '{{ tags.name }}',
-                    body: '<table class="overpass-tags">{% for k, v in tags %}{% if k[:5] != "addr:" %}<tr><th>{{ k }}</th><td>{% if k matches "/email/" %}<a href="mailto:{{ v }}">{{ v }}</a>{% elseif v matches "/^http/" %}<a href="{{ v }}">{{ v }}</a>{% elseif v matches "/^www/" %}<a href="http://{{ v }}">{{ v }}</a>{% else %}{{ v }}{% endif %}</td></tr>{% endif %}{% endfor %}</table>',
+                    body: this.renderOverpassPopupBody,
                     markerSymbol:
                         '<svg width="25px" height="41px" anchorX="12" anchorY="41" viewBox="0 0 32 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M16,1 C7.7146,1 1,7.65636364 1,15.8648485 C1,24.0760606 16,51 16,51 C16,51 31,24.0760606 31,15.8648485 C31,7.65636364 24.2815,1 16,1 L16,1 Z" fill="#436978"></path></svg>',
                     markerSign,
@@ -238,6 +242,63 @@ BR.LayersConfig = L.Class.extend({
                 onLoadEnd: this._hideOverpassLoadingIndicator.bind(this),
             }
         );
+    },
+
+    renderOverpassPopupBody: function (overpassData) {
+        let output = '';
+
+        output += '<table class="overpass-tags">';
+
+        output += '<thead>';
+        output +=
+            '<tr><th class="overpass-label-key">' +
+            i18next.t('layers.overpass-table-key') +
+            '</th><th class="overpass-label-value">' +
+            i18next.t('layers.overpass-table-value') +
+            '</th></tr>';
+        output += '</thead>';
+
+        output += '<tbody>';
+        for (let key in overpassData.tags) {
+            if (key.substring(0, 5) === 'addr:') {
+                continue;
+            }
+
+            let value = BR.Util.sanitizeHTMLContent(overpassData.tags[key]);
+            key = BR.Util.sanitizeHTMLContent(key);
+
+            if (key.match(/email/)) {
+                value = '<a href="mailto:' + value + '">' + value + '</a>';
+            }
+            if (value.match(/^https?:\/\//)) {
+                value = '<a href="' + value + '">' + value + '</a>';
+            }
+            if (value.match(/^www/)) {
+                value = '<a href="https://' + value + '">' + value + '</a>';
+            }
+            output += '<tr>';
+            output += '<th>' + key + '</th>';
+            output += '<td>' + value + '</td>';
+            output += '</tr>';
+        }
+        output += '</tbody>';
+
+        output += '</table>';
+
+        output += '<div class="overpass-osm-link">';
+        output +=
+            '<a href="https://www.openstreetmap.org/' +
+            overpassData.type +
+            '/' +
+            overpassData.osm_id +
+            '" target="_blank" title="' +
+            i18next.t('layers.overpass-inspect-at-openstreetmap') +
+            '">';
+        output += i18next.t('layers.overpass-osm');
+        output += '</a>';
+        output += '</div>';
+
+        return output;
     },
 
     createOpenStreetMapNotesLayer: function () {
@@ -264,12 +325,24 @@ BR.LayersConfig = L.Class.extend({
     _replaceMvtTileKey: function (style) {
         if (!style) return;
 
+        // Sources can be specified by `url` (string) or `tiles` (array), we handle
+        // both variants here.
+        // see specification:
+        // https://maplibre.org/maplibre-gl-js-docs/style-spec/sources/
         for (const source of Object.values(style.sources)) {
-            const tiles = source.tiles;
-            for (const [i, url] of tiles?.entries()) {
-                var keyObj = this.getKeyName(url);
+            if (source.url) {
+                let keyObj = this.getKeyName(source.url);
                 if (keyObj && BR.keys[keyObj.name]) {
-                    tiles[i] = url.replace(`{${keyObj.urlVar}}`, BR.keys[keyObj.name]);
+                    source.url = source.url.replace(`{${keyObj.urlVar}}`, BR.keys[keyObj.name]);
+                }
+            }
+            if (source.tiles) {
+                const tiles = source.tiles;
+                for (const [i, url] of tiles?.entries()) {
+                    let keyObj = this.getKeyName(url);
+                    if (keyObj && BR.keys[keyObj.name]) {
+                        tiles[i] = url.replace(`{${keyObj.urlVar}}`, BR.keys[keyObj.name]);
+                    }
                 }
             }
         }
@@ -381,6 +454,7 @@ BR.LayersConfig = L.Class.extend({
                     L.Util.extend(josmOptions, {
                         layers: props.layers,
                         format: props.format,
+                        transparent: props.transparent || false,
                     })
                 );
             } else {

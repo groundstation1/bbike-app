@@ -36,10 +36,11 @@
     "format_kml": "KML",
     "include": "Include",
     "include_waypoints": "Waypoints",
-    "route-from-to": "{{from}} -> {{to}} ({{distance}}km)",
+    "route-from-to": "{{from}} - {{to}} ({{distance}}km)",
     "route-loop": "{{from}} ({{distance}}km)",
     "title": "Export route",
-    "trackname": "Name"
+    "trackname": "Name",
+    "turns_enabled": "Includes turn instructions"
   },
   "footer": {
     "ascend": "Ascend",
@@ -80,7 +81,11 @@
     "custom-layer-url-label": "Custom layer URL/Query",
     "customize": "Customize layers",
     "opacity-slider": "Opacity slider",
+    "overpass-inspect-at-openstreetmap": "Inspect Object at OpenStreetMap",
     "overpass-loading-indicator": "Running Overpass API query ...",
+    "overpass-osm": "OSM",
+    "overpass-table-key": "Key",
+    "overpass-table-value": "Value",
     "remove-selection": "Remove selection"
   },
   "loadNogos": {
@@ -160,6 +165,7 @@
     "route-quality-altitude": "Altitude coding",
     "route-quality-cost": "Cost coding",
     "route-quality-incline": "Incline coding",
+    "route-quality-surface": "Road surface/quality",
     "route-quality-shortcut": "{{action}} ({{key}} key to toggle)",
     "route-tooltip-segment": "Drag to create a new waypoint. Click to toggle straight line.",
     "route-tooltip-waypoint": "Waypoint. Drag to move; Click to remove.",

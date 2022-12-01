@@ -441,6 +441,7 @@
                                                     checked
                                                 />
                                                 <span data-i18n="export.format_gpx">GPX</span>
+                                                <i class="fa fa-location-arrow format-turns-enabled" hidden></i>
                                             </label>
                                         </div>
                                         <div class="form-check">
@@ -479,6 +480,19 @@
                                                 <span data-i18n="export.format_csv">CSV</span>
                                             </label>
                                         </div>
+                                        <div class="form-check">
+                                            <label class="form-check-label" for="format-fit">
+                                                <input
+                                                    class="form-check-input"
+                                                    id="format-fit"
+                                                    type="radio"
+                                                    name="format"
+                                                    value="fit"
+                                                />
+                                                <span data-i18n="export.format_fit">FIT</span>
+                                                <i class="fa fa-location-arrow format-turns-enabled" hidden></i>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </fieldset>
@@ -511,7 +525,7 @@
                                 <i class="fa fa-cloud-download"></i>
                                 <i
                                     hidden
-                                    id="export-beeline-warning"
+                                    id="export-download-warning"
                                     class="fa fa-exclamation-triangle"
                                     style="font-size: 10px; position: absolute; margin-top: -3px; margin-left: -1px"
                                 ></i>
@@ -1234,7 +1248,7 @@
         <script>
             // global package prefix for BRouter web application
             BR = {};
-            BR.version = '0.18.0';
+            BR.version = '0.18.1';
 
             console.log(
                 '\r\n###\r\n###  BRouter-Web\r\n###\r\n###  Please note that the routing API used here is not public!\r\n###\r\n'

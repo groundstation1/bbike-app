@@ -48,6 +48,13 @@ BR.confLayers.tree = {
             },
             'topplus-open',
             {
+                'FR': [
+                    'ignf-aerial',
+                    'ignf-map',
+                    'ignf-scan25',
+                ]
+            },
+            {
                 'IL': [
                     'Israel_Hiking',
                     'Israel_MTB',
@@ -72,6 +79,7 @@ BR.confLayers.tree = {
             'Waymarked_Trails-Cycling',
             'Waymarked_Trails-Hiking',
             'Waymarked_Trails-MTB',
+            'openrailwaymap',
             'mapillary-coverage',
             'osm-notes'
         ],

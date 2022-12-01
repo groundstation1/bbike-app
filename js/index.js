@@ -36,7 +36,6 @@
             pois,
             circlego,
             urlHash;
-
         // By default bootstrap-select use glyphicons
         $('.selectpicker').selectpicker({
             iconBase: 'fa',
@@ -223,9 +222,10 @@
 
         function requestUpdate(updatable) {
             var track = routing.toPolyline(),
-                segments = routing.getSegments();
+                segments = routing.getSegments(),
+                segmentsLayer = routing._segments;
 
-            updatable.update(track, segments);
+            updatable.update(track, segments, segmentsLayer);
         }
 
         routingOptions = new BR.RoutingOptions();
@@ -342,7 +342,7 @@
             } else {
                 stats.update(track, segments);
             }
-            trackMessages.update(track, segments);
+            trackMessages.update(track, segments, segmentsLayer);
             trackAnalysis.update(track, segments);
 
             exportRoute.update(latLngs, segments);
@@ -366,7 +366,8 @@
 
         nogos.addTo(map);
 
-        circlego = BR.circleGoArea(routing, nogos, pois);
+        // disabled for now, to be removed later
+        // circlego = BR.circleGoArea(routing, nogos, pois);
         if (circlego != null) {
             pois.circlego = circlego;
             circlego.addTo(map);
