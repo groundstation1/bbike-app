@@ -20,13 +20,13 @@
     } else {
         // desktop configuration
 
-        BR.conf.host = 'https://brouter.cxberlin.com';
+        BR.conf.host = 'https://brouter.cxberlin.net';
 
         // Pre-loading selected profile disabled locally. Needs brouter-web to run on a
         // local web server with the profiles in a subdirectory or allowing file access
         // in the Browser (security!), see
         // https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally
-        BR.conf.profilesUrl = 'https://routing.cxberlin.com/brouter-profiles/';
+        BR.conf.profilesUrl = 'https://routing.cxberlin.net/brouter-profiles/';
         //BR.conf.profilesUrl = 'file://YOUR_PATH_TO/profiles2/';
     }
 
@@ -59,8 +59,7 @@
     };
 
     BR.conf.overlays = {
-        'CXB Gravel': 'https://gravel-tiles.cxberlin.com/tile/{z}/{x}/{y}.png',
-        'CXB POIs': 'https://poitiles.cxberlin.com/tile/{z}/{x}/{y}.png'
+        'CXB Gravel+POI': 'https://tiles.cxberlin.net/tile/{z}/{x}/{y}.png'
     };
 
     // Base layer to show on start, as position number in the layer switcher, starting from 0, default is first
