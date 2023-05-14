@@ -1,6 +1,14 @@
 name: build
 
-on: [push, pull_request]
+on:
+    push:
+        branches-ignore: 
+            - 'renovate/**'
+    pull_request:
+
+concurrency:
+    group: ${{ github.head_ref || github.ref_name }}
+    cancel-in-progress: true
 
 jobs:
     build:
