@@ -34,7 +34,7 @@
     ],
     "dependencies": {
         "@bagage/leaflet.restoreview": "1.0.1",
-        "@fortawesome/fontawesome-free": "6.3.0",
+        "@fortawesome/fontawesome-free": "6.4.0",
         "@ideditor/temaki": "5.2.0",
         "@mapbox/maki": "8.0.1",
         "@mapbox/polyline": "1.1.1",
@@ -48,14 +48,15 @@
         "bootstrap": "4.6.2",
         "bootstrap-select": "1.13.18",
         "bootstrap-slider": "11.0.2",
-        "codemirror": "5.65.12",
+        "codemirror": "5.65.13",
+        "compare-versions": "^6.0.0",
         "core-js-bundle": "3.29.1",
         "datatables": "1.10.18",
         "fit-file-writer": "tbsmark86/fit-file-writer#3eebe13",
         "font-awesome": "4.7.0",
         "geo-data-exchange": "alexcojocaru/geo-data-exchange#v1.1.0",
         "i18next": "19.9.2",
-        "i18next-browser-languagedetector": "7.0.1",
+        "i18next-browser-languagedetector": "7.0.2",
         "i18next-xhr-backend": "3.2.2",
         "jquery": "3.6.4",
         "jquery-i18next": "1.2.1",
@@ -65,7 +66,7 @@
         "leaflet-easybutton": "*",
         "leaflet-editable": "1.2.0",
         "leaflet-filelayer": "1.2.0",
-        "leaflet-geometryutil": "0.10.1",
+        "leaflet-geometryutil": "0.10.2",
         "leaflet-hotline": "tbsmark86/Leaflet.hotline#25b2457",
         "leaflet-osm-notes": "osmlab/leaflet-osm-notes#af2aa811",
         "leaflet-plugins": "3.4.0",
@@ -81,20 +82,20 @@
         "maplibre-gl": "2.4.0",
         "overpass-layer": "3.4.0",
         "popper.js": "1.16.1",
+        "qrcodejs": "^1.0.0",
         "regenerator-runtime": "0.13.11",
         "togpx": "nrenner/togpx#722d291",
         "tokml": "0.4.0",
-        "url-search-params": "1.1.0",
         "whatwg-fetch": "^3.6.2"
     },
     "devDependencies": {
-        "@babel/cli": "7.19.3",
-        "@babel/core": "7.20.2",
-        "@babel/preset-env": "7.20.2",
+        "@babel/cli": "7.22.5",
+        "@babel/core": "7.22.5",
+        "@babel/preset-env": "7.22.5",
         "autoprefixer": "10.4.14",
-        "browser-sync": "2.28.3",
+        "browser-sync": "2.29.3",
         "del": "6.1.1",
-        "eslint": "8.28.0",
+        "eslint": "8.43.0",
         "eslint-plugin-compat": "4.0.2",
         "gulp": "4.0.2",
         "gulp-babel": "8.0.0",
@@ -126,7 +127,7 @@
         "merge-stream": "2.0.0",
         "node-fetch": "3.2.10",
         "npmfiles": "0.1.3",
-        "postcss": "8.4.18",
+        "postcss": "8.4.24",
         "prettier": "2.7.1",
         "pretty-quick": "3.1.3"
     },
@@ -297,6 +298,21 @@
         "overpass-layer": {
             "main": [
                 "dist/overpass-layer.js"
+            ]
+        },
+        "qrcodejs": {
+            "main": [
+                "qrcode.js"
+            ]
+        },
+        "url-search-params-polyfill": {
+            "main": [
+                "index.js"
+            ]
+        },
+        "compare-versions": {
+            "main": [
+                "lib/umd/index.js"
             ]
         },
         "@mapbox/maki": {

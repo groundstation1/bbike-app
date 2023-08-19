@@ -31,6 +31,7 @@
   "export": {
     "format": "Format",
     "format_csv": "CSV",
+    "format_fit": "FIT",
     "format_geojson": "GeoJSON",
     "format_gpx": "GPX",
     "format_kml": "KML",
@@ -64,11 +65,46 @@
     "total-energy": "Total Energy",
     "travel-time": "Travel time"
   },
+  "help": {
+    "keyboard-shortcuts": "Keyboard Shortcuts",
+    "shortcut-about": "Show “About” dialog",
+    "shortcut-add-poi": "Add “Point of Interest” (Esc exits this mode)",
+    "shortcut-allowed-zone": "Draw allowed zone",
+    "shortcut-color-coding": "Cycle through color-coding modes",
+    "shortcut-delete-route": "Delete route",
+    "shortcut-draw": "Enter draw mode",
+    "shortcut-elevation-profile": "Toggle elevation profile",
+    "shortcut-exit-draw": "Exit draw mode or close dialog",
+    "shortcut-export": "Export route",
+    "shortcut-help-dialog": "Open this help dialog",
+    "shortcut-load-track": "Load track",
+    "shortcut-load-track-as-route": "Load track as route",
+    "shortcut-locate": "Center current position (geolocation)",
+    "shortcut-move-map": "Move map",
+    "shortcut-mute-route": "Hide route temporarily (as long as key is down, “mute”)",
+    "shortcut-nogo": "Draw no-go area (Esc exits this mode)",
+    "shortcut-nogo-load": "Load no-go area",
+    "shortcut-profile-select": "Select routing profile",
+    "shortcut-reverse": "Reverse route",
+    "shortcut-search": "Search for locations",
+    "shortcut-share": "Share route",
+    "shortcut-sidebar-switch-tabs": "Cycle through tabs in sidebar",
+    "shortcut-sidebar-toggle": "Toggle sidebar",
+    "shortcut-straight-line-append": "Append straight line (in draw mode)",
+    "shortcut-straight-line-toggle": "Toggle straight line (in draw mode)",
+    "shortcut-strava-layer": "Toggle Strava layer",
+    "shortcut-undo": "Remove last point from route (“undo”)",
+    "shortcut-zoom-map": "Zoom map",
+    "title": "Help"
+  },
   "keyboard": {
     "backspace": "Backspace",
     "escape": "Escape",
     "generic-shortcut": "{{action}} ({{key}} key)",
     "shift": "Shift"
+  },
+  "keyboard-shortcuts": {
+    "title": "Help/Keyboard shortcuts"
   },
   "layers": {
     "add-base": "Add base layer",
@@ -165,8 +201,8 @@
     "route-quality-altitude": "Altitude coding",
     "route-quality-cost": "Cost coding",
     "route-quality-incline": "Incline coding",
-    "route-quality-surface": "Road surface/quality",
     "route-quality-shortcut": "{{action}} ({{key}} key to toggle)",
+    "route-quality-surface": "Road surface/quality",
     "route-tooltip-segment": "Drag to create a new waypoint. Click to toggle straight line.",
     "route-tooltip-waypoint": "Waypoint. Drag to move; Click to remove.",
     "strava-biking": "Show Strava biking segments",
@@ -218,7 +254,16 @@
       "vm-forum-liegerad-schnell": "Recumbent bike (fast)",
       "vm-forum-velomobil-schnell": "Velomobile (fast)"
     },
-    "profile-tooltip": "\n({{key}} key to switch)"
+    "profile-tooltip": "\n({{key}} key to switch)",
+    "share": "Share",
+    "share-tooltip": "Share Route"
+  },
+  "qrcode": {
+    "large": "Large",
+    "medium": "Medium",
+    "msg-too-long": "Cannot create QR Code: Route definition is too long. Removing some waypoints may help fit all data into the QR Code.",
+    "msg-unknown-error": "Cannot create QR Code: An unknown error occurred. See the browser console for details. Maybe the route definition is too long. Removing some waypoints may help fit all data into the QR Code.",
+    "small": "Small"
   },
   "searchfav": {
     "addfavorite": "add as favorite",
@@ -227,6 +272,16 @@
     "import": "import favorites from file",
     "openfavorites": "open favorite list",
     "removeall": "delete all favorites"
+  },
+  "share": {
+    "copy-link": "Copy Link to this Route",
+    "introduction": "Share this route using a QR Code or by copying the link to the clipboard. The QR Code opens the route on your smartphone browser for viewing, changing or exporting.",
+    "mastodon-enter-server-name": "Enter Mastodon server name",
+    "title": "Share Route",
+    "tooltip-email": "Share by email",
+    "tooltip-facebook": "Share on Facebook",
+    "tooltip-mastodon": "Share on Mastodon",
+    "tooltip-whatsapp": "Share on WhatsApp"
   },
   "sidebar": {
     "analysis": {
