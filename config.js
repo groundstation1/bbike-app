@@ -1,4 +1,4 @@
-(function() {
+(function () {
     var hostname = window.location.hostname;
     var origin = window.location.protocol + '//' + hostname + (window.location.port ? ':' + window.location.port : '');
 
@@ -12,55 +12,47 @@
     //var params = new URLSearchParams(window.location.search.slice(1));
     //BR.conf.transit = params.has('transit') && (params.get('transit') === 'true');
 
-    if (hostname.endsWith('brouter.de')) {
-        // online service (brouter.de) configuration
+    // Chaos Bike Berlin hybrid app: always use the public brouter.de routing
+    // server (cross-origin; brouter.de sends Access-Control-Allow-Origin: *).
+    // The chaos_bike_berlin profile is NOT installed on brouter.de, so it is
+    // uploaded at runtime as a temporary custom profile (see js/index.js,
+    // BR.confChaosProfile) and routed via the returned custom_<id>.
+    BR.conf.host = 'https://brouter.de';
 
-        BR.conf.host = origin;
-        BR.conf.profilesUrl = origin + '/brouter/profiles2/';
-    } else {
-        // desktop configuration
+    // Profile .brf files are bundled with the app and served locally (relative
+    // to index.html), so no external profile host is needed.
+    BR.conf.profilesUrl = 'profiles/';
 
-        BR.conf.host = 'https://brouter.cxberlin.net';
+    // Name of the web app/instance, e.g. used as GPX creator and link text
+    BR.conf.appName = 'Chaos Bike Berlin';
 
-        // Pre-loading selected profile disabled locally. Needs brouter-web to run on a
-        // local web server with the profiles in a subdirectory or allowing file access
-        // in the Browser (security!), see
-        // https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally
-        BR.conf.profilesUrl = 'https://routing.cxberlin.net/brouter-profiles/';
-        //BR.conf.profilesUrl = 'file://YOUR_PATH_TO/profiles2/';
-    }
+    // Bundled profile auto-applied on load (uploaded to brouter.de as custom profile)
+    BR.conf.chaosProfile = 'chaos_bike_berlin';
 
     BR.conf.privacyPolicyUrl = '/privacypolicy.html';
 
-    // Set the initial position and zoom level of the map
-    BR.conf.initialMapLocation = [50.99, 9.86];
-    BR.conf.initialMapZoom = 5;
+    // Set the initial position and zoom level of the map (Berlin)
+    BR.conf.initialMapLocation = [52.52, 13.405];
+    BR.conf.initialMapZoom = 12;
 
-    BR.conf.profiles = [
-        'gravel',
-        'rennrad',
-        'rennrad-alternativ',
-        'trekking',
-        'trekking-radwege',
-        'mtb-xc',
-    ];
+    BR.conf.profiles = ['chaos_bike_berlin'];
 
-    // Removes default base layers when 'true'. Useful for only having custom layers (see below).
-    BR.conf.clearBaseLayers = false;
+    // Only use our curated, app-friendly tile layers (no auto-loaded
+    // tile.openstreetmap.org default, whose policy forbids app/bulk use).
+    BR.conf.clearBaseLayers = true;
 
-    // Add custom tile layers
-    // URL template see http://leafletjs.com/reference.html#tilelayer
-    // Multiple entries separated by comma (,)
+    // Custom tile layers. Only the active layer fetches tiles, so listing
+    // alternatives is fine. CyclOSM (index 0) is the default bike map.
+    // To add Thunderforest's cycling maps, put your key in keys.js
+    // (BR.keys.thunderforest) and uncomment the entries below.
     BR.conf.baseLayers = {
-        // 'display name': 'url'[,]
-        // e.g. for offline tiles with https://github.com/develar/mapsforge-tile-server
-        //'Mapsforge Tile Server': 'http://localhost:6090/{z}/{x}/{y}.png'
-        'CyclOSM': 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
+        CyclOSM: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+        OpenTopoMap: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        // 'Thunderforest OpenCycleMap': 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=YOUR_KEY',
+        // 'Thunderforest Outdoors': 'https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=YOUR_KEY',
     };
 
-    BR.conf.overlays = {
-        'CXB Gravel+POI': 'https://tiles.cxberlin.net/tile/{z}/{x}/{y}.png'
-    };
+    BR.conf.overlays = {};
 
     // Base layer to show on start, as position number in the layer switcher, starting from 0, default is first
     BR.conf.defaultBaseLayerIndex = 0;
@@ -77,22 +69,22 @@
             weight: 5,
             dashArray: [10, 10],
             opacity: 0.6,
-            color: 'magenta'
+            color: 'magenta',
         },
         track: {
             weight: 5,
             color: 'magenta',
-            opacity: BR.conf.defaultOpacity
+            opacity: BR.conf.defaultOpacity,
         },
         trackCasing: {
             weight: 8,
             color: 'white',
             // assumed to be same as track, see setOpacity
-            opacity: BR.conf.defaultOpacity
+            opacity: BR.conf.defaultOpacity,
         },
         nodata: {
-            color: 'darkred'
-        }
+            color: 'darkred',
+        },
     };
 
     BR.conf.markerColors = {
@@ -100,7 +92,7 @@
         poi: '#436978',
         start: '#72b026',
         via: '#38aadd',
-        stop: '#d63e2a'
+        stop: '#d63e2a',
     };
 
     // transit (intermodal routing) demo config
@@ -114,7 +106,7 @@
             'fastbike',
             'shortest',
             'moped',
-            'car-test'
+            'car-test',
         ];
     }
 

@@ -2,9 +2,13 @@ node_modules/
 nbproject/
 .idea/
 /.project
-/config.js
-/keys.js
 /dist
+/www
 brouter-web*.zip
 yarn-error.log
 package-lock.json
+_yarn_install.log
+_yarn_build.log
+
+# Note: config.js and keys.js are committed in this fork — they define the
+# Chaos Bike Berlin app (host=brouter.de, chaos profile, CyclOSM, Photon).

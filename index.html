@@ -3,9 +3,14 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#1b5e20" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Chaos Bike Berlin" />
 
-        <title data-i18n="title">BRouter web client</title>
+        <title>Chaos Bike Berlin</title>
 
         <!-- inject:css -->
         <link rel="stylesheet" href="dist/brouter-web.css" />
@@ -25,8 +30,9 @@
             >
                 <span class="fa fa-bars"></span>
             </button>
-            <a class="navbar-brand order-md-first" href="https://www.cxberlin.net">
-              <img src="https://www.cxberlin.net/wp-content/uploads/2020/09/CXB-Logo-klein-abgerundet.png" alt="CXBerlin" loading="eager" height="45px">
+            <a class="navbar-brand order-md-first cbb-brand" href="#">
+              <span class="fa fa-bicycle"></span>
+              <span class="cbb-brand-text">Chaos Bike <span class="cbb-brand-accent">Berlin</span></span>
             </a>
             <div class="collapse navbar-collapse" id="collapsingNavbar">
                 <div class="navbar-nav">
@@ -350,7 +356,7 @@
                         <p>
                           Der CXBerlin Routenplaner basiert auf dem
                           <a href="https://github.com/nrenner/brouter-web" target="_blank">offiziellen BRouter Web Client</a>
-                          und der <a href="http://www.brouter.de" target="_blank">BRouter Routing Engine<a>.
+                          und der <a href="http://www.brouter.de" target="_blank">BRouter Routing Engine</a>.
                         </p>
                         <p><i>Anleitung:</i>
                           <div>Eine <a href="https://cxberlin.com/routenplaner-arbeitsflaechen-faq/" target="_blank">kurze Anleitung</a>

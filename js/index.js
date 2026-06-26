@@ -425,9 +425,26 @@
         router.setOptions(nogos.getOptions());
         router.setOptions(routingOptions.getOptions());
 
+        // Upload the bundled chaos profile to brouter.de as a temporary custom
+        // profile and switch routing to the returned custom_<id>. brouter.de has
+        // no named "chaos_bike_berlin" profile, so this is required for routing.
+        // `then` runs after the custom profile is active (or immediately if N/A).
+        function applyChaosProfile(then) {
+            then = then || function () {};
+            var selected = routingOptions.getOptions().profile;
+            var text = BR.conf.chaosProfile && profile.cache[BR.conf.chaosProfile];
+            if (!text || L.BRouter.isCustomProfile(selected)) {
+                then();
+                return;
+            }
+            profile.fire('update', { profileText: text, callback: then });
+        }
+
         // (check before hash plugin init)
         if (!location.hash) {
-            profile.update(routingOptions.getOptions());
+            profile.update(routingOptions.getOptions(), function () {
+                applyChaosProfile();
+            });
 
             // restore active layers from local storage when called without hash
             layersControl.loadActiveLayers();
@@ -455,11 +472,15 @@
 
             const optsOrDefault = Object.assign({}, routingOptions.getOptions(), opts);
             profile.update(optsOrDefault, () => {
-                if (opts.lonlats) {
-                    routing.draw(false);
-                    routing.clear();
-                    routing.setWaypoints(opts.lonlats, opts.beelineFlags);
-                }
+                var setWaypoints = function () {
+                    if (opts.lonlats) {
+                        routing.draw(false);
+                        routing.clear();
+                        routing.setWaypoints(opts.lonlats, opts.beelineFlags);
+                    }
+                };
+                // upload chaos profile first (if needed), then route with custom_<id>
+                applyChaosProfile(setWaypoints);
             });
 
             if (opts.pois) {

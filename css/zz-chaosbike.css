@@ -1,0 +1,75 @@
+/*
+ * Chaos Bike Berlin - app theme overrides
+ * Loaded last (filename sorts after style.css) so these rules win.
+ * Green, cycling-flavoured accent + mobile/touch friendliness.
+ */
+
+:root {
+    --cbb-green: #2e7d32;
+    --cbb-green-dark: #173a1f;
+    --cbb-green-light: #9ccc65;
+    --cbb-lime: #7cb342;
+}
+
+/* --- Brand --- */
+.navbar.bg-dark {
+    background: linear-gradient(90deg, var(--cbb-green-dark), #11281a) !important;
+}
+.cbb-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #fff !important;
+}
+.cbb-brand .fa-bicycle {
+    color: var(--cbb-lime);
+    font-size: 1.45rem;
+}
+.cbb-brand-accent {
+    color: var(--cbb-green-light);
+}
+.cbb-brand-text {
+    white-space: nowrap;
+}
+
+/* --- Safe areas (notches / gesture bars) when fullscreen on device --- */
+.navbar {
+    padding-top: calc(0.5rem + env(safe-area-inset-top));
+    padding-left: calc(1rem + env(safe-area-inset-left));
+    padding-right: calc(1rem + env(safe-area-inset-right));
+}
+
+/* --- Touch friendliness on small screens --- */
+@media (max-width: 767.98px) {
+    /* a touch larger tap targets in the navbar dropdowns */
+    .navbar-nav .dropdown-item {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+    /* keep the profile/search controls comfortably wide */
+    #profile-alternative-form .bootstrap-select {
+        width: 100% !important;
+    }
+}
+
+/* --- Accent for primary actions / active tabs --- */
+.btn-primary {
+    background-color: var(--cbb-green);
+    border-color: var(--cbb-green);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #256428;
+    border-color: #256428;
+}
+.nav-tabs .nav-link.active {
+    border-bottom: 2px solid var(--cbb-green);
+}
+
+/* --- Make the search/geocoder a bit more prominent --- */
+.leaflet-control-geocoder {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}

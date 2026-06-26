@@ -6,6 +6,8 @@
     "main": "js/index.js",
     "scripts": {
         "build": "gulp",
+        "app:build": "gulp && node assemble-www.mjs",
+        "app:sync": "gulp && node assemble-www.mjs && cap sync android",
         "transifex-push": "gulp i18next && tx push --source",
         "transifex-pull": "tx pull --all --minimum-perc 1 --force && (git add locales/*.json && git commit locales/*.json -m 'Update translations' || true)",
         "layers": "node layers/josm/extract.mjs && node layers/collection/extract.mjs",
@@ -34,6 +36,9 @@
     ],
     "dependencies": {
         "@bagage/leaflet.restoreview": "1.0.1",
+        "@capacitor/android": "^8.4.1",
+        "@capacitor/core": "^8.4.1",
+        "@capacitor/geolocation": "^8.2.0",
         "@fortawesome/fontawesome-free": "6.4.0",
         "@ideditor/temaki": "5.2.0",
         "@mapbox/maki": "8.0.1",
@@ -92,6 +97,7 @@
         "@babel/cli": "7.22.5",
         "@babel/core": "7.22.5",
         "@babel/preset-env": "7.22.5",
+        "@capacitor/cli": "^8.4.1",
         "autoprefixer": "10.4.14",
         "browser-sync": "2.29.3",
         "del": "6.1.1",

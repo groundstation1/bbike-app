@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chaos Bike Berlin</string>
+    <string name="title_activity_main">Chaos Bike Berlin</string>
+    <string name="package_name">de.qgarden.chaosbike</string>
+    <string name="custom_url_scheme">de.qgarden.chaosbike</string>
+</resources>

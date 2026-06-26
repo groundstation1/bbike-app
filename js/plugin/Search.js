@@ -3,9 +3,12 @@ BR.Search = class extends L.Control.Geocoder {
         super(
             Object.assign(
                 {
+                    // Photon (komoot) instead of Nominatim: public, free, and
+                    // permits interactive/autocomplete search (Nominatim forbids
+                    // autocomplete and caps at 1 req/s).
                     geocoder: new L.Control.Geocoder.LatLng({
-                        next: new L.Control.Geocoder.Nominatim({
-                            serviceUrl: 'https://nominatim.openstreetmap.org/',
+                        next: new L.Control.Geocoder.Photon({
+                            serviceUrl: 'https://photon.komoot.io/api/',
                         }),
                         sizeInMeters: 800,
                     }),

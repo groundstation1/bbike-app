@@ -66,7 +66,10 @@ var paths = {
                     !RegExp('core-js-bundle/.*\\.js', 'i').test(f) &&
                     !RegExp('regenerator-runtime/.*\\.js', 'i').test(f) &&
                     !RegExp('maplibre-gl/.*\\.js', 'i').test(f) &&
-                    !RegExp('@maplibre/maplibre-gl-leaflet/.*\\.js', 'i').test(f)
+                    !RegExp('@maplibre/maplibre-gl-leaflet/.*\\.js', 'i').test(f) &&
+                    // Capacitor is injected natively at runtime, never bundle its
+                    // CJS into the browser script (would throw "exports is not defined")
+                    !RegExp('@capacitor', 'i').test(f)
             )
         )
         .concat([
