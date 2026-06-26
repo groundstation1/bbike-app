@@ -26,6 +26,8 @@
         meMarker: null,
         routeReq: 0,
         altIdx: 0, // 0 = main route, 1..3 = alternatives
+        surfaceSegments: null, // { groupName: [ [latlng,...], ... ] }
+        hoverLayer: null,
     };
 
     var map, $stops, $sheet, busyEl;
@@ -432,6 +434,7 @@
             map.removeLayer(state.casingLayer);
             state.casingLayer = null;
         }
+        clearSurfaceHighlight();
         showAlts(false);
         setSheet('hidden');
     }
@@ -445,6 +448,7 @@
         var coords = f.geometry.coordinates.map(function (c) {
             return [c[1], c[0]];
         });
+        clearSurfaceHighlight();
         if (state.routeLayer) map.removeLayer(state.routeLayer);
         if (state.casingLayer) map.removeLayer(state.casingLayer);
         state.casingLayer = L.polyline(coords, { color: '#fff', weight: 8, opacity: 0.9 }).addTo(map);
@@ -457,7 +461,7 @@
         el('statAscend').textContent = Math.round(parseFloat(p['filtered ascend'] || 0)) + ' m';
 
         buildElevation(f.geometry.coordinates);
-        buildSurface(p.messages);
+        buildSurface(p.messages, coords);
         showAlts(true);
         updateAlts();
         // open fully on the first route so alternatives + surface + elevation are
@@ -546,32 +550,64 @@
         return { name: 'Unknown', color: '#b0bec5' };
     }
 
-    function buildSurface(messages) {
+    function surfaceColor(name) {
+        for (var i = 0; i < SURFACE_GROUPS.length; i++) if (SURFACE_GROUPS[i].name === name) return SURFACE_GROUPS[i].color;
+        return '#b0bec5';
+    }
+
+    // messages = brouter per-segment data, coords = route geometry as [lat,lng,...]
+    function buildSurface(messages, coords) {
         var bar = el('surfaceBar'),
             legend = el('surfaceLegend');
         bar.innerHTML = '';
         legend.innerHTML = '';
+        state.surfaceSegments = null;
         if (!messages || messages.length < 2) {
             legend.innerHTML = '<div style="color:#6b7686;font-size:13px">No surface data</div>';
             return;
         }
         var header = messages[0];
-        var di = header.indexOf('Distance'),
+        var loni = header.indexOf('Longitude'),
+            lati = header.indexOf('Latitude'),
+            di = header.indexOf('Distance'),
             wi = header.indexOf('WayTags');
         if (di === -1 || wi === -1) return;
+
+        // map each route vertex (microdegree key) to its index, to slice geometry per segment
+        var idxMap = {};
+        if (coords) {
+            for (var k = 0; k < coords.length; k++) {
+                idxMap[Math.round(coords[k][0] * 1e6) + ',' + Math.round(coords[k][1] * 1e6)] = k;
+            }
+        }
+
         var acc = {},
-            total = 0;
+            geom = {},
+            total = 0,
+            prevIdx = 0;
         for (var i = 1; i < messages.length; i++) {
             var d = parseFloat(messages[i][di]) || 0;
             var g = classifySurface(messages[i][wi]);
             acc[g.name] = acc[g.name] || { dist: 0, color: g.color };
             acc[g.name].dist += d;
             total += d;
+
+            if (coords) {
+                var key = parseInt(messages[i][lati], 10) + ',' + parseInt(messages[i][loni], 10);
+                var idx = idxMap[key];
+                if (idx != null && idx > prevIdx) {
+                    geom[g.name] = geom[g.name] || [];
+                    geom[g.name].push(coords.slice(prevIdx, idx + 1));
+                    prevIdx = idx;
+                }
+            }
         }
         if (!total) return;
+        state.surfaceSegments = geom;
+
         var entries = Object.keys(acc)
-            .map(function (k) {
-                return { name: k, dist: acc[k].dist, color: acc[k].color };
+            .map(function (k2) {
+                return { name: k2, dist: acc[k2].dist, color: acc[k2].color };
             })
             .sort(function (a, b) {
                 return b.dist - a.dist;
@@ -583,6 +619,7 @@
             seg.style.width = pct + '%';
             seg.style.background = e.color;
             seg.title = e.name + ' ' + pct.toFixed(0) + '%';
+            bindSurfaceHover(seg, e.name);
             bar.appendChild(seg);
 
             var lg = document.createElement('div');
@@ -597,8 +634,46 @@
                 '% · ' +
                 fmtDist(e.dist) +
                 '</span>';
+            bindSurfaceHover(lg, e.name);
             legend.appendChild(lg);
         });
+    }
+
+    // highlight all road segments of a surface group on the map
+    function highlightSurface(name) {
+        clearSurfaceHighlight();
+        var segs = state.surfaceSegments && state.surfaceSegments[name];
+        if (!segs || !segs.length) return;
+        var lg = L.layerGroup();
+        var color = surfaceColor(name);
+        segs.forEach(function (s) {
+            L.polyline(s, { color: '#fff', weight: 11, opacity: 0.95 }).addTo(lg);
+            L.polyline(s, { color: color, weight: 6, opacity: 1 }).addTo(lg);
+        });
+        lg.addTo(map);
+        state.hoverLayer = lg;
+    }
+    function clearSurfaceHighlight() {
+        if (state.hoverLayer) {
+            map.removeLayer(state.hoverLayer);
+            state.hoverLayer = null;
+        }
+    }
+    function bindSurfaceHover(elm, name) {
+        elm.addEventListener('mouseenter', function () {
+            highlightSurface(name);
+        });
+        elm.addEventListener('mouseleave', clearSurfaceHighlight);
+        // touch: press to highlight, release to clear
+        elm.addEventListener(
+            'touchstart',
+            function () {
+                highlightSurface(name);
+            },
+            { passive: true }
+        );
+        elm.addEventListener('touchend', clearSurfaceHighlight);
+        elm.addEventListener('touchcancel', clearSurfaceHighlight);
     }
 
     // ---------- bottom sheet ----------
