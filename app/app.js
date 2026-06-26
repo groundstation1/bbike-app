@@ -460,7 +460,9 @@
         buildSurface(p.messages);
         showAlts(true);
         updateAlts();
-        if ($sheet.getAttribute('aria-hidden') === 'true') setSheet('collapsed');
+        // open fully on the first route so alternatives + surface + elevation are
+        // visible; keep the user's chosen state when only switching alternatives
+        if ($sheet.getAttribute('aria-hidden') === 'true') setSheet('open');
     }
 
     // ---------- elevation chart ----------
