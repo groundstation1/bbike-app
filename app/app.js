@@ -25,6 +25,7 @@
         casingLayer: null,
         meMarker: null,
         routeReq: 0,
+        altIdx: 0, // 0 = main route, 1..3 = alternatives
     };
 
     var map, $stops, $sheet, busyEl;
@@ -376,7 +377,9 @@
                 lonlats +
                 '&profile=' +
                 state.customId +
-                '&alternativeidx=0&format=geojson';
+                '&alternativeidx=' +
+                state.altIdx +
+                '&format=geojson';
             var reqId = ++state.routeReq;
             busy(true);
             fetch(url)
@@ -400,6 +403,12 @@
                         uploadProfile().then(doRoute).catch(function () {
                             toast('Routing unavailable');
                         });
+                    } else if (state.altIdx > 0) {
+                        // this alternative doesn't exist for the trip → fall back to main
+                        state.altIdx = 0;
+                        updateAlts();
+                        toast('No alternative for this trip');
+                        doRoute();
                     } else {
                         toast('No route found');
                     }
@@ -423,6 +432,7 @@
             map.removeLayer(state.casingLayer);
             state.casingLayer = null;
         }
+        showAlts(false);
         setSheet('hidden');
     }
 
@@ -448,7 +458,9 @@
 
         buildElevation(f.geometry.coordinates);
         buildSurface(p.messages);
-        setSheet('collapsed');
+        showAlts(true);
+        updateAlts();
+        if ($sheet.getAttribute('aria-hidden') === 'true') setSheet('collapsed');
     }
 
     // ---------- elevation chart ----------
@@ -602,6 +614,33 @@
         else if ($sheet.classList.contains('collapsed')) setSheet('open');
     }
 
+    // ---------- alternatives selector ----------
+    var ALT_LABELS = ['Main', 'Alt 1', 'Alt 2', 'Alt 3'];
+    function buildAlts() {
+        var host = el('alts');
+        host.innerHTML = '';
+        ALT_LABELS.forEach(function (lab, i) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'alt' + (i === state.altIdx ? ' active' : '');
+            b.textContent = lab;
+            b.addEventListener('click', function () {
+                if (state.altIdx === i) return;
+                state.altIdx = i;
+                updateAlts();
+                route();
+            });
+            host.appendChild(b);
+        });
+    }
+    function updateAlts() {
+        var btns = el('alts').children;
+        for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', i === state.altIdx);
+    }
+    function showAlts(on) {
+        el('alts').classList.toggle('show', !!on);
+    }
+
     // ---------- init ----------
     function init() {
         $stops = el('stops');
@@ -612,6 +651,7 @@
 
         initMap();
         buildRows();
+        buildAlts();
 
         el('addStop').addEventListener('click', function () {
             state.rows.push({ latlng: null, name: '', marker: null });
