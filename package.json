@@ -6,8 +6,8 @@
     "main": "js/index.js",
     "scripts": {
         "build": "gulp",
-        "app:build": "gulp && node assemble-www.mjs",
-        "app:sync": "gulp && node assemble-www.mjs && cap sync android",
+        "app:build": "node assemble-www.mjs",
+        "app:sync": "node assemble-www.mjs && cap sync android",
         "transifex-push": "gulp i18next && tx push --source",
         "transifex-pull": "tx pull --all --minimum-perc 1 --force && (git add locales/*.json && git commit locales/*.json -m 'Update translations' || true)",
         "layers": "node layers/josm/extract.mjs && node layers/collection/extract.mjs",

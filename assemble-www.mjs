@@ -2,40 +2,45 @@
 /*
  * assemble-www.mjs
  * ----------------
- * Collects the runtime files of the built brouter-web site into ./www, which is
- * the Capacitor `webDir` wrapped into the Android app.
+ * Builds ./www (the Capacitor webDir) for the clean Chaos Bike Berlin app:
+ *   - app/            -> www/            (index.html, app.css, app.js)
+ *   - node_modules/leaflet/dist -> www/leaflet/
+ *   - profiles/chaos_bike_berlin.brf -> www/profiles/
  *
- * Run AFTER the gulp build (`yarn build`). The combined command is:
- *     yarn app:build       (gulp build + this script)
+ *   yarn app:build   = this script
+ *   yarn app:sync    = this script + cap sync android
  *
- * Mirrors what Dockerfile serves: index.html + dist/ + config.js + keys.js,
- * plus the bundled profiles/ (loaded at runtime via BR.conf.profilesUrl).
+ * (The brouter-web fork sources remain in the repo for reference but are no
+ * longer used by the app.)
  */
-import { existsSync, rmSync, mkdirSync, cpSync, copyFileSync } from 'node:fs';
+import { existsSync, rmSync, mkdirSync, cpSync, copyFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const www = join(root, 'www');
 
-const dirs = ['dist', 'profiles'];
-const files = ['index.html', 'config.js', 'keys.js'];
-
-for (const f of [...dirs, ...files]) {
-    if (!existsSync(join(root, f))) {
-        console.error(`[assemble-www] ✗ missing ${f} — did you run "yarn build" first?`);
+function need(p) {
+    if (!existsSync(join(root, p))) {
+        console.error(`[assemble-www] ✗ missing ${p}`);
         process.exit(1);
     }
 }
+['app', 'node_modules/leaflet/dist', 'profiles/chaos_bike_berlin.brf'].forEach(need);
 
 rmSync(www, { recursive: true, force: true });
 mkdirSync(www, { recursive: true });
 
-for (const d of dirs) {
-    cpSync(join(root, d), join(www, d), { recursive: true });
-}
-for (const f of files) {
-    copyFileSync(join(root, f), join(www, f));
+// app source
+for (const f of readdirSync(join(root, 'app'))) {
+    cpSync(join(root, 'app', f), join(www, f), { recursive: true });
 }
 
-console.log(`[assemble-www] ✓ assembled www/ (${[...dirs, ...files].join(', ')})`);
+// leaflet runtime (js, css, images/)
+cpSync(join(root, 'node_modules/leaflet/dist'), join(www, 'leaflet'), { recursive: true });
+
+// bundled routing profile
+mkdirSync(join(www, 'profiles'), { recursive: true });
+copyFileSync(join(root, 'profiles/chaos_bike_berlin.brf'), join(www, 'profiles/chaos_bike_berlin.brf'));
+
+console.log('[assemble-www] ✓ assembled www/ (app + leaflet + profile)');

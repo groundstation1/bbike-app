@@ -1,41 +1,53 @@
 # Chaos Bike Berlin — Android app
 
-A hybrid (Capacitor) Android wrapper around [brouter-web](https://github.com/nrenner/brouter-web),
-trimmed to the **chaos_bike_berlin** routing profile. Forked from
-[cxberlin/brouter-web](https://github.com/cxberlin/brouter-web).
+A clean, mobile-first bike routing app for Berlin using the **chaos_bike_berlin**
+profile. Custom lightweight UI (vanilla JS + Leaflet) that routes against the
+public **brouter.de** server. Hybrid-packaged for Android with Capacitor.
 
-## What it does
+The repo started as a fork of [cxberlin/brouter-web](https://github.com/cxberlin/brouter-web)
+(its sources remain for reference), but the app itself is the purpose-built
+frontend in **`app/`** — it does not use the brouter-web UI.
 
--   Routes A → B → C with click-to-add / draggable waypoints
--   Address search (Photon geocoder), pick-on-map, and **current location** (GPS)
--   Elevation profile, surface / way-type stats, distance & **estimated travel time**
--   Uses **only** your `chaos_bike_berlin` profile
+## Features (only these, by design)
 
-## How it works (no self-hosting)
+- From / To / via **stops**: type an address (Photon autocomplete), **tap the map**, or **📍 my location**
+- **Set map to location** (locate button)
+- Routes **A → B → C**; tap map to add a stop; drag a pin to move it
+- **Elevation profile**, **surface breakdown** (paved / gravel / unpaved / cobble-sett), **distance** & **estimated time**
+- Uses **only** your `chaos_bike_berlin` profile
 
-All services are public third parties — nothing you have to host:
+## How it works (nothing self-hosted)
 
-| Concern        | Service                                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Routing engine | public **brouter.de** (`BR.conf.host`)                                                                                                      |
-| Your profile   | `profiles/chaos_bike_berlin.brf` is uploaded to brouter.de at launch as a temporary custom profile; routing uses the returned `custom_<id>` |
-| Map tiles      | **CyclOSM** (default, no key) — Thunderforest/MapTiler slots in `config.js` + `keys.js`                                                     |
-| Address search | **Photon** (komoot)                                                                                                                         |
+| Concern | Service |
+|---|---|
+| Routing engine | public **brouter.de** |
+| Your profile | `profiles/chaos_bike_berlin.brf` is uploaded to brouter.de at startup as a temporary custom profile; routing uses the returned `custom_<id>` (auto re-uploaded if it expires) |
+| Map tiles | **CyclOSM** |
+| Address search | **Photon** (komoot) |
 
-The profile is single-sourced from `../bbike/chaos_bike_berlin.ini`
+Profile is single-sourced from `../bbike/chaos_bike_berlin.ini`
 (copied here as `profiles/chaos_bike_berlin.brf`).
+
+## Source layout
+
+```
+app/                 the actual app — index.html, app.css, app.js
+profiles/            chaos_bike_berlin.brf
+assemble-www.mjs     builds www/ = app/ + leaflet + profile
+www/                 build output (Capacitor webDir, git-ignored)
+android/             Capacitor Android project
+```
 
 ## Build & run
 
-Prereqs: Node (tested on v25), Yarn, Android Studio (for the Android build).
+Prereqs: Node, Yarn, Android Studio (for the Android build).
 
 ```bash
-yarn install            # once
-yarn app:build          # gulp build + assemble www/
-yarn app:sync           # build + assemble + copy into android/  (run before opening Android Studio)
+yarn install        # once (pulls leaflet + capacitor)
+yarn app:build      # assemble www/
 ```
 
-### Test in a desktop browser (no Android needed)
+### Test in a desktop browser
 
 ```bash
 yarn app:build
@@ -43,30 +55,19 @@ npx http-server www -p 8080 -c-1
 # open http://localhost:8080
 ```
 
-(The app always talks to brouter.de, so routing works straight from the browser.)
-
-Alternatively `yarn serve` runs brouter-web's dev server with live reload.
-
 ### Build the Android app
 
 ```bash
-yarn app:sync           # IMPORTANT: refreshes android/ web assets from your latest build
-npx cap open android    # opens Android Studio
+yarn app:sync           # assemble www/ + copy into android/  (run before building)
+npx cap open android    # opens Android Studio, then press Run
 ```
 
-Then press **Run** in Android Studio (device or emulator). Location permission is
-requested on first use of the "locate me" button.
+- App id: `de.qgarden.chaosbike`
+- Served over `https://localhost` in the WebView (secure context → geolocation works)
+- Location permission is requested on first use of the 📍 button
 
--   App id: `de.qgarden.chaosbike`
--   Served over `https://localhost` inside the WebView (secure context → geolocation works)
+## Tweaking
 
-## Editing the profile
-
-Edit `profiles/chaos_bike_berlin.brf` (or re-copy from `../bbike/chaos_bike_berlin.ini`),
-then `yarn app:sync` and rebuild in Android Studio.
-
-## Config knobs
-
--   `config.js` — routing host, tile layers, geocoder, map start position
--   `keys.js` — optional API keys (Thunderforest etc.)
--   `capacitor.config.json` — app id / name / webDir
+- Routing host, tiles, geocoder, start position: top of `app/app.js` (`CONFIG`)
+- Profile: edit `profiles/chaos_bike_berlin.brf` (or recopy from the `.ini`), then `yarn app:sync`
+- App id / name: `capacitor.config.json`

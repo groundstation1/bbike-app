@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <meta name="theme-color" content="#1b5e20" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <title>Chaos Bike Berlin</title>
+
+        <link rel="stylesheet" href="leaflet/leaflet.css" />
+        <link rel="stylesheet" href="app.css" />
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <!-- Trip planner card (top) -->
+        <div id="planner" class="planner">
+            <div id="stops" class="stops"><!-- stop rows injected here --></div>
+            <button id="addStop" class="add-stop" type="button">
+                <span class="ico">+</span> Add stop
+            </button>
+        </div>
+
+        <!-- Floating actions -->
+        <button id="locateBtn" class="fab" type="button" title="My location" aria-label="My location">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <path
+                    fill="currentColor"
+                    d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9 3h-2.06A7 7 0 0 0 13 5.06V3h-2v2.06A7 7 0 0 0 5.06 11H3v2h2.06A7 7 0 0 0 11 18.94V21h2v-2.06A7 7 0 0 0 18.94 13H21v-2Zm-9 6a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"
+                />
+            </svg>
+        </button>
+
+        <!-- Result bottom sheet -->
+        <div id="sheet" class="sheet" aria-hidden="true">
+            <div id="sheetHandle" class="sheet-handle"><span></span></div>
+            <div class="sheet-summary">
+                <div class="stat">
+                    <div class="stat-val" id="statDist">–</div>
+                    <div class="stat-lbl">Distance</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="statTime">–</div>
+                    <div class="stat-lbl">Est. time</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="statAscend">–</div>
+                    <div class="stat-lbl">Ascent</div>
+                </div>
+            </div>
+            <div class="sheet-body">
+                <div class="section">
+                    <div class="section-title">Elevation</div>
+                    <div id="elevation" class="elevation"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">Surface</div>
+                    <div id="surfaceBar" class="surface-bar"></div>
+                    <div id="surfaceLegend" class="surface-legend"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast" class="toast"></div>
+
+        <script src="leaflet/leaflet.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
