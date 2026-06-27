@@ -112,13 +112,25 @@
                     icon: wpIcon(label, color),
                     draggable: true,
                 }).addTo(map);
+                row.marker.on('dragstart', function () {
+                    row.marker._dragging = true;
+                });
                 row.marker.on('dragend', function () {
                     var ll = row.marker.getLatLng();
                     row.latlng = ll;
                     row.name = ll.lat.toFixed(5) + ', ' + ll.lng.toFixed(5);
                     var inp = row.dom && row.dom.input;
                     if (inp) inp.value = row.name;
+                    // ignore the click Leaflet may emit right after a drag
+                    setTimeout(function () {
+                        row.marker._dragging = false;
+                    }, 0);
                     route();
+                });
+                // tap a placed waypoint to delete it (marker clicks don't reach the map)
+                row.marker.on('click', function () {
+                    if (row.marker._dragging) return;
+                    clearOrRemoveRow(state.rows.indexOf(row));
                 });
             } else {
                 row.marker.setLatLng(row.latlng);
