@@ -442,7 +442,28 @@
         });
     }
 
+    function shortName(r) {
+        var n = r.name || '';
+        if (/^-?\d+\.\d{3,}/.test(n)) return 'Pin';
+        return n.split(',')[0] || 'Pin';
+    }
+    function updateSummary() {
+        var set = activeLatLngs();
+        var s = el('plannerSummary');
+        if (!s) return;
+        if (set.length === 0) {
+            s.textContent = 'Plan a route';
+        } else if (set.length === 1) {
+            s.textContent = shortName(set[0]);
+        } else {
+            var via = set.length - 2;
+            s.textContent =
+                shortName(set[0]) + ' → ' + shortName(set[set.length - 1]) + (via > 0 ? '  · +' + via : '');
+        }
+    }
+
     function route() {
+        updateSummary();
         var pts = activeLatLngs();
         if (pts.length < 2) {
             clearRoute();
@@ -772,6 +793,72 @@
         else if ($sheet.classList.contains('collapsed')) setSheet('open');
     }
 
+    // animate the sheet to a snapped state from an inline drag position
+    function snapSheet(open) {
+        var target = open ? 0 : collapsedTranslate();
+        $sheet.style.transition = '';
+        $sheet.style.transform = 'translateY(' + target + 'px)';
+        setSheet(open ? 'open' : 'collapsed');
+        var done = function () {
+            $sheet.style.transform = '';
+            $sheet.removeEventListener('transitionend', done);
+        };
+        $sheet.addEventListener('transitionend', done);
+    }
+    function collapsedTranslate() {
+        return Math.max(0, $sheet.getBoundingClientRect().height - 172);
+    }
+    // drag the sheet from anywhere except the scrolling stats body / buttons
+    function initSheetDrag() {
+        var drag = null;
+        $sheet.addEventListener('pointerdown', function (e) {
+            if ($sheet.getAttribute('aria-hidden') === 'true') return;
+            if (e.target.closest('.sheet-body, button, a, input')) return; // let those work / scroll
+            var collapsed = collapsedTranslate();
+            drag = {
+                id: e.pointerId,
+                startY: e.clientY,
+                startT: $sheet.classList.contains('open') ? 0 : collapsed,
+                collapsed: collapsed,
+                moved: false,
+            };
+            $sheet.classList.add('dragging');
+            try {
+                $sheet.setPointerCapture(e.pointerId);
+            } catch (err) {
+                /* ignore */
+            }
+        });
+        $sheet.addEventListener('pointermove', function (e) {
+            if (!drag || e.pointerId !== drag.id) return;
+            var t = Math.min(drag.collapsed, Math.max(0, drag.startT + (e.clientY - drag.startY)));
+            if (Math.abs(e.clientY - drag.startY) > 4) drag.moved = true;
+            $sheet.style.transform = 'translateY(' + t + 'px)';
+        });
+        var end = function (e) {
+            if (!drag || (e.pointerId !== undefined && e.pointerId !== drag.id)) return;
+            var dy = e.clientY - drag.startY;
+            var t = Math.min(drag.collapsed, Math.max(0, drag.startT + dy));
+            $sheet.classList.remove('dragging');
+            var open;
+            if (!drag.moved)
+                open = !$sheet.classList.contains('open'); // tap = toggle
+            else open = t < drag.collapsed / 2; // snap to nearer state
+            drag = null;
+            snapSheet(open);
+        };
+        $sheet.addEventListener('pointerup', end);
+        $sheet.addEventListener('pointercancel', end);
+    }
+
+    function initPlannerFold() {
+        el('plannerToggle').addEventListener('click', function () {
+            var p = el('planner');
+            var collapsed = p.classList.toggle('collapsed');
+            this.setAttribute('aria-expanded', String(!collapsed));
+        });
+    }
+
     // ---------- alternatives selector ----------
     var ALT_LABELS = ['Main', 'Alt 1', 'Alt 2', 'Alt 3'];
     function buildAlts() {
@@ -816,7 +903,9 @@
             buildRows();
         });
         el('locateBtn').addEventListener('click', locate);
-        el('sheetHandle').addEventListener('click', toggleSheet);
+        initSheetDrag(); // drag anywhere on the sheet chrome (also taps to toggle)
+        initPlannerFold();
+        updateSummary();
 
         uploadProfile().catch(function () {
             toast('Could not reach routing server');

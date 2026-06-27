@@ -20,10 +20,16 @@
 
         <!-- Trip planner card (top) -->
         <div id="planner" class="planner">
-            <div id="stops" class="stops"><!-- stop rows injected here --></div>
-            <button id="addStop" class="add-stop" type="button">
-                <span class="ico">+</span> Add stop
+            <button id="plannerToggle" class="planner-head" type="button" aria-expanded="true">
+                <span id="plannerSummary" class="planner-summary">Plan a route</span>
+                <svg class="planner-chevron" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                </svg>
             </button>
+            <div id="plannerBody" class="planner-body">
+                <div id="stops" class="stops"><!-- stop rows injected here --></div>
+                <button id="addStop" class="add-stop" type="button"><span class="ico">+</span> Add stop</button>
+            </div>
         </div>
 
         <!-- Floating actions -->

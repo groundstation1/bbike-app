@@ -50,9 +50,47 @@ button {
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 8px;
+    padding: 6px 8px;
     max-width: 460px;
     margin: 0 auto;
+}
+.planner-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 4px;
+    background: none;
+    border: none;
+    text-align: left;
+    color: var(--ink);
+}
+.planner-summary {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.planner-chevron {
+    flex: 0 0 auto;
+    color: var(--muted);
+    transition: transform 0.2s;
+}
+.planner.collapsed .planner-chevron {
+    transform: rotate(-90deg);
+}
+.planner.collapsed .planner-body {
+    display: none;
+}
+.planner-body {
+    /* cap height so many stops scroll instead of taking over the screen */
+    max-height: min(42vh, 360px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 .stops {
     display: flex;
@@ -219,6 +257,20 @@ button {
 .sheet.collapsed {
     /* peek tall enough to keep the alternatives selector + summary on screen */
     transform: translateY(calc(100% - 172px - var(--safe-bottom)));
+}
+.sheet.dragging {
+    transition: none; /* follow the finger while dragging */
+}
+/* draggable chrome (everything except the scrolling stats body) */
+.sheet-handle,
+.sheet-summary,
+.alts {
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+}
+.sheet.dragging .sheet-handle {
+    cursor: grabbing;
 }
 .sheet-handle {
     display: grid;
