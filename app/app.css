@@ -65,6 +65,28 @@ button {
     gap: 8px;
     position: relative;
 }
+.drag-handle {
+    flex: 0 0 auto;
+    width: 22px;
+    display: grid;
+    place-items: center;
+    color: #c2c8d0;
+    cursor: grab;
+    touch-action: none;
+    font-size: 15px;
+    line-height: 1;
+    align-self: stretch;
+}
+.drag-handle:active {
+    cursor: grabbing;
+}
+.stop-row.sortable-ghost {
+    opacity: 0.35;
+}
+.stop-row.sortable-chosen {
+    background: #eef7ef;
+    border-radius: 10px;
+}
 .stop-dot {
     flex: 0 0 auto;
     width: 22px;

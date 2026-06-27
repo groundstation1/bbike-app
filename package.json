@@ -89,6 +89,7 @@
         "popper.js": "1.16.1",
         "qrcodejs": "^1.0.0",
         "regenerator-runtime": "0.13.11",
+        "sortablejs": "^1.15.7",
         "togpx": "nrenner/togpx#722d291",
         "tokml": "0.4.0",
         "whatwg-fetch": "^3.6.2"

@@ -39,6 +39,9 @@ for (const f of readdirSync(join(root, 'app'))) {
 // leaflet runtime (js, css, images/)
 cpSync(join(root, 'node_modules/leaflet/dist'), join(www, 'leaflet'), { recursive: true });
 
+// sortablejs (drag-and-drop reorder of stops)
+copyFileSync(join(root, 'node_modules/sortablejs/Sortable.min.js'), join(www, 'sortable.min.js'));
+
 // bundled routing profile
 mkdirSync(join(www, 'profiles'), { recursive: true });
 copyFileSync(join(root, 'profiles/chaos_bike_berlin.brf'), join(www, 'profiles/chaos_bike_berlin.brf'));

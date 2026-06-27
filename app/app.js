@@ -132,6 +132,16 @@
         while (state.rows.length < 2) state.rows.push({ latlng: null, name: '', marker: null });
     }
 
+    var GRIP_SVG =
+        '<svg viewBox="0 0 20 20" width="14" height="14"><g fill="currentColor">' +
+        '<circle cx="7" cy="5" r="1.4"/><circle cx="13" cy="5" r="1.4"/>' +
+        '<circle cx="7" cy="10" r="1.4"/><circle cx="13" cy="10" r="1.4"/>' +
+        '<circle cx="7" cy="15" r="1.4"/><circle cx="13" cy="15" r="1.4"/></g></svg>';
+
+    function placeholderFor(i, n) {
+        return i === 0 ? 'Start — address, map tap or 📍' : i === n - 1 ? 'Destination' : 'Stop';
+    }
+
     function buildRows() {
         ensureMinRows();
         $stops.innerHTML = '';
@@ -139,6 +149,11 @@
         state.rows.forEach(function (row, i) {
             var wrap = document.createElement('div');
             wrap.className = 'stop-row';
+
+            var grip = document.createElement('div');
+            grip.className = 'drag-handle';
+            grip.title = 'Drag to reorder';
+            grip.innerHTML = GRIP_SVG;
 
             var dot = document.createElement('div');
             dot.className = 'stop-dot';
@@ -149,7 +164,7 @@
             input.className = 'stop-input';
             input.type = 'text';
             input.autocomplete = 'off';
-            input.placeholder = i === 0 ? 'Start — address, map tap or 📍' : i === n - 1 ? 'Destination' : 'Stop';
+            input.placeholder = placeholderFor(i, n);
             input.value = row.name || '';
 
             var act = document.createElement('button');
@@ -163,7 +178,7 @@
             suggest.className = 'suggest';
             suggest.style.display = 'none';
 
-            row.dom = { input: input, suggest: suggest };
+            row.dom = { wrap: wrap, dot: dot, input: input, suggest: suggest };
 
             input.addEventListener(
                 'input',
@@ -180,14 +195,41 @@
                 }, 180);
             });
             act.addEventListener('click', function () {
-                clearOrRemoveRow(i);
+                clearOrRemoveRow(state.rows.indexOf(row));
             });
 
+            wrap.appendChild(grip);
             wrap.appendChild(dot);
             wrap.appendChild(input);
             wrap.appendChild(act);
             wrap.appendChild(suggest);
             $stops.appendChild(wrap);
+        });
+
+        // drag-and-drop reorder (touch + mouse), dragging only via the grip
+        if (state.sortable) state.sortable.destroy();
+        state.sortable = Sortable.create($stops, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function (evt) {
+                if (evt.oldIndex === evt.newIndex) return;
+                var item = state.rows.splice(evt.oldIndex, 1)[0];
+                state.rows.splice(evt.newIndex, 0, item);
+                refreshDecorations(); // Sortable already moved the DOM node; just re-label
+                refreshMarkers();
+                route();
+            },
+        });
+    }
+
+    // update dot numbers/colors + placeholders in place (after a drag reorder)
+    function refreshDecorations() {
+        var n = state.rows.length;
+        state.rows.forEach(function (row, i) {
+            if (!row.dom) return;
+            row.dom.dot.style.background = wpColor(i, n);
+            row.dom.dot.textContent = i + 1;
+            row.dom.input.placeholder = placeholderFor(i, n);
         });
     }
 
@@ -222,14 +264,41 @@
         return -1;
     }
 
+    // "flight of the crow" cheapest insertion: index that adds the least
+    // straight-line detour (keeps existing points in order). Returns 0..n.
+    function bestInsertionIndex(P) {
+        var pts = state.rows.map(function (r) {
+            return r.latlng;
+        });
+        var n = pts.length;
+        if (n < 2) return n;
+        var best = n,
+            bestCost = Infinity;
+        for (var k = 0; k <= n; k++) {
+            var cost;
+            if (k === 0) cost = P.distanceTo(pts[0]);
+            else if (k === n) cost = pts[n - 1].distanceTo(P);
+            else cost = pts[k - 1].distanceTo(P) + P.distanceTo(pts[k]) - pts[k - 1].distanceTo(pts[k]);
+            if (cost < bestCost) {
+                bestCost = cost;
+                best = k;
+            }
+        }
+        return best;
+    }
+
     function addPointFromMap(latlng) {
         var name = latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5);
         var i = firstEmptyIndex();
-        if (i === -1) {
-            state.rows.push({ latlng: null, name: '', marker: null });
-            buildRows();
-            i = state.rows.length - 1;
+        if (i !== -1) {
+            // fill the first empty slot (e.g. initial start/destination)
+            setRow(i, latlng, name);
+            return;
         }
+        // all stops set -> insert where it best fits along the route
+        i = bestInsertionIndex(latlng);
+        state.rows.splice(i, 0, { latlng: null, name: '', marker: null });
+        buildRows();
         setRow(i, latlng, name);
     }
 
