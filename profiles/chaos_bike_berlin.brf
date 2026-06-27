@@ -19,6 +19,8 @@ assign   stick_to_cycleroutes     = false  # %stick_to_cycleroutes% | Set true t
 assign   avoid_unsafe             = true  # %avoid_unsafe% | Set true to avoid standard highways | boolean
 assign   avoid_path               = false  # %avoid_path% | Set true to avoid pathes | boolean
 assign   allow_sidewalks          = false  # %allow_sidewalks% | Set true to allow plain sidewalks (footway=sidewalk). Default avoids them so the router stays on the street (or a real cycle path) instead of flipping onto the sidewalk to dodge sett. | boolean
+assign   avoid_sett               = true   # %avoid_sett% | Strongly avoid cobblestone/sett on ANY way type. Server-independent (does not need cxberlin's estimated_* data), so it works on plain brouter.de too. | boolean
+assign   sett_strength            = 30     # %sett_strength% | How hard to avoid sett/cobblestone (added to costfactor). Higher = longer detours to dodge sett. | number
 
 assign   consider_noise           = true  # %consider_noise% | Enable to favor a low-noise route | boolean
 assign   consider_river           = true  # %consider_river% | Enable to favor a route along rivers or sees | boolean
@@ -94,6 +96,14 @@ assign probablyGood = or ispaved and ( or isbike highway=footway ) not isshit
 assign issidewalk = footway=sidewalk
 assign sidewalk_penalty =
      if ( and issidewalk and ( not allow_sidewalks ) ( not isbike ) ) then 8
+     else 0
+
+# Universal sett/cobblestone penalty. The per-highway costs below only catch
+# sett on residential/service streets; this catches it everywhere (cycleways,
+# tertiary, paths, ...). Unlike the consider_* preferences, it needs no special
+# data, so it actually avoids sett on brouter.de, not just on cxberlin.
+assign sett_penalty =
+     if ( and isshit avoid_sett ) then sett_strength
      else 0
 
 
@@ -278,6 +288,7 @@ assign costfactor
   add noise_penalty
   add traffic_penalty
   add sidewalk_penalty
+  add sett_penalty
 
   #
   # apply oneway-and access-penalties
