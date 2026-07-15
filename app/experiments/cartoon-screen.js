@@ -106,19 +106,23 @@
         else v = (1 + frac / 1024) * Math.pow(2, exp - 15);
         return sign ? -v : v;
     }
+    var HAS_F16ARR = typeof Float16Array !== 'undefined';
     function dataToF32(t) {
         if (t.type === 'float16') {
-            var d = t.data,
-                out = new Float32Array(d.length);
+            var d = t.data;
+            // native Float16Array (Chrome 135+): elements are already numbers
+            if (HAS_F16ARR && d instanceof Float16Array) return Float32Array.from(d);
+            var out = new Float32Array(d.length);
             for (var i = 0; i < d.length; i++) out[i] = f16tof32(d[i]);
             return out;
         }
         return t.data;
     }
     function floatTensor(ort, useF16, f32data, dims) {
-        return useF16
-            ? new ort.Tensor('float16', f32ArrayToF16(f32data), dims)
-            : new ort.Tensor('float32', f32data, dims);
+        if (!useF16) return new ort.Tensor('float32', f32data, dims);
+        // ort-web requires native Float16Array for float16 tensors when available
+        if (HAS_F16ARR) return new ort.Tensor('float16', Float16Array.from(f32data), dims);
+        return new ort.Tensor('float16', f32ArrayToF16(f32data), dims);
     }
 
     // ---------- runtime deps -------------------------------------------------
