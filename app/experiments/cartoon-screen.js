@@ -22,8 +22,9 @@
     'use strict';
 
     var CONFIG = {
-        ortUrl: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js',
-        ortWasmDir: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/',
+        // 1.22: JSEP fp16 kernel coverage (1.19 lacked fp16 Clip -> vae_decoder failed)
+        ortUrl: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.webgpu.min.js',
+        ortWasmDir: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/',
         transformersUrl: 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2',
         modelBase: 'https://huggingface.co/schmuell/sd-turbo-ort-web/resolve/main',
         prompt:
