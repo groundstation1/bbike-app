@@ -28,8 +28,8 @@
         transformersUrl: 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2',
         modelBase: 'https://huggingface.co/schmuell/sd-turbo-ort-web/resolve/main',
         prompt:
-            'soft watercolor painting, highly stylized cartoon, bird\'s eye view of a city, ' +
-            'cute 3D buildings, fluffy trees, parks, storybook illustration, gentle pastel colors',
+            'highly stylized cartoon, drawn, bird\'s eye view of a city, cute 3D buildings with ' +
+            'visible facades and roofs, fluffy trees, parks, no text. Very lively, saturated and colorful.',
         strength: 0.55, // 0..1 — higher = more stylization/invention, less map fidelity
         size: 512,
         dbName: 'sd-turbo-models',

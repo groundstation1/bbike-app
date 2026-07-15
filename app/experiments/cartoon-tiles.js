@@ -21,15 +21,14 @@
     var CONFIG = {
         endpoint: 'https://fal.run/fal-ai/fast-sdxl/image-to-image',
         prompt:
-            'soft watercolor painting, highly stylized cartoon, bird\'s eye view of a city, ' +
-            'cute 3D buildings with visible facades and roofs, fluffy trees, parks, storybook ' +
-            'illustration, gentle pastel colors, clean, no text',
+            'highly stylized cartoon, drawn, bird\'s eye view of a city, cute 3D buildings with ' +
+            'visible facades and roofs, fluffy trees, parks, no text. Very lively, saturated and colorful.',
         negative_prompt: 'text, labels, letters, numbers, watermark, photo, photorealistic, blurry, noise',
         strength: 0.65, // higher = more creative liberty (3D-ification) but less map-accurate
         steps: 8,
         guidance_scale: 3,
         sendMaxSide: 1024, // downscale the captured screen before sending (SDXL native)
-        styleId: 'fal-fullscreen-watercolor3d-v1', // bump to invalidate cached views
+        styleId: 'fal-fullscreen-lively3d-v2', // bump to invalidate cached views
         cacheName: 'cartoon-tiles',
     };
 
