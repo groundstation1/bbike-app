@@ -53,6 +53,19 @@
     function setBusy(b) {
         if (btn) btn.textContent = b ? '⏳' : '🎨';
     }
+    var noteT;
+    function notify(msg) {
+        // non-blocking notice via the app's #toast element (alert() freezes the page)
+        console.warn('[cartoon-ai]', msg);
+        var t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(noteT);
+        noteT = setTimeout(function () {
+            t.classList.remove('show');
+        }, 5000);
+    }
 
     // ---- tiny IndexedDB string cache -------------------------------------
     var dbP;
@@ -194,7 +207,7 @@
                 .then(function (r) {
                     if (r.status === 401 || r.status === 403) {
                         disabledDueToError = true;
-                        alert('AI cartoon: fal API key rejected. Disabling experiment.');
+                        notify('AI cartoon: fal API key rejected. Disabling experiment.');
                         throw new Error('auth');
                     }
                     if (!r.ok)
@@ -242,7 +255,7 @@
                 console.warn('[cartoon-ai]', e);
                 if (String(e && e.message) !== 'no-key') {
                     disable();
-                    if (!disabledDueToError) alert('AI cartoon failed: ' + (e && e.message ? e.message : e));
+                    if (!disabledDueToError) notify('AI cartoon failed: ' + (e && e.message ? e.message : e));
                 }
             })
             .finally(function () {
@@ -275,15 +288,15 @@
             pane.appendChild(canvas);
             ctx2d = canvas.getContext('2d');
         }
-        map().on('movestart zoomstart', hide);
-        map().on('moveend zoomend resize', render);
+        // ONE-SHOT: one image per click for the current view (each render costs $).
+        // Panning drags the image along; zooming dismisses; click again to dismiss.
+        map().on('zoomstart', disable);
         render();
     }
     function disable() {
         if (!active) return;
         active = false;
-        map().off('movestart zoomstart', hide);
-        map().off('moveend zoomend resize', render);
+        map().off('zoomstart', disable);
         hide();
         if (btn) btn.style.background = '#fff';
         setBusy(false);
